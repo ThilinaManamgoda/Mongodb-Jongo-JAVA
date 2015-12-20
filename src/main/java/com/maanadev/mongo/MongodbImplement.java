@@ -36,4 +36,7 @@ public class MongodbImplement<T> {
 	public long getCount(){
 		return collection.count();
 	}
+	public void delete(String id){
+		collection.remove("{ _id:"+id+"}");
+	}
 }
