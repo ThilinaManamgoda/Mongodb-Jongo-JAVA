@@ -16,13 +16,14 @@ public class Example {
 		p.setLastName("lastName");
 		
 		//SAVING IN "TEST3" DATABASE AND COLLECTION "PERSONS2"
-		
 		m.save(p);
 		System.out.println("saved");
-		//GET THE PERSON OBJECT
 		
+		//GET THE PERSON OBJECT
 		Person p_return =m.get("1234");
 		
+		//DELETE 
+//		m.delete("1234");
 		
 		System.out.println(p_return.getFirstName());
 	}
