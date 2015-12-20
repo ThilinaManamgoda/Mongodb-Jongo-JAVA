@@ -33,4 +33,7 @@ public class MongodbImplement<T> {
 	     T return_t=(T) collection.findOne("{ _id:"+id+"}").as(t);
 		return return_t;
 	}
+	public long getCount(){
+		return collection.count();
+	}
 }

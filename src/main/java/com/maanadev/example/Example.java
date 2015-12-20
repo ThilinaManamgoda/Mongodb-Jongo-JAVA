@@ -11,8 +11,8 @@ public class Example {
 		//CREATING PERSON OBJECT
 		
 		Person p = new Person();
-		p.set_id(123);
-		p.setFirstName("firstName");
+		p.set_id(1234);
+		p.setFirstName("ssss");
 		p.setLastName("lastName");
 		
 		//SAVING IN "TEST3" DATABASE AND COLLECTION "PERSONS2"
@@ -21,10 +21,10 @@ public class Example {
 		System.out.println("saved");
 		//GET THE PERSON OBJECT
 		
-		Person p_return =m.get("123");
+		Person p_return =m.get("1234");
 		
 		
-		System.out.println(p.getFirstName());
+		System.out.println(p_return.getFirstName());
 	}
 
 }
