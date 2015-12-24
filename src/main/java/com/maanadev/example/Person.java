@@ -8,7 +8,20 @@ public class Person {
     
     private String firstName;
     private String lastName;
-   //getters & setters
+    private int age;
+   public long getKey() {
+		return key;
+	}
+	public void setKey(long key) {
+		this.key = key;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	//getters & setters
 	public long get_id() {
 		return key;
 	}

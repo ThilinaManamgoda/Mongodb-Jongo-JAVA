@@ -1,7 +1,12 @@
 package com.maanadev.mongo;
 
+import java.util.NoSuchElementException;
+
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
+import org.jongo.MongoCursor;
+
+import com.maanadev.example.Person;
 import com.mongodb.DB;
 import com.mongodb.MongoClient;
 
@@ -11,7 +16,7 @@ public class MongodbImplement<T> {
 	protected DB db;
 	protected String collectionName;
 	protected Class<T> t;
-
+	private MongoClient mongoClient;
 	public MongodbImplement(String dbName, String collectionName, Class<T> t) {
 		this.t = t;
 		this.collectionName = collectionName;
@@ -26,6 +31,9 @@ public class MongodbImplement<T> {
 		collection.save(t);
 
 	}
+	public void close(){
+		mongoClient.close();
+	}
 
 	public T get(String id) {
 
@@ -39,5 +47,16 @@ public class MongodbImplement<T> {
 
 	public void delete(String id) {
 		collection.remove("{ _id:" + id + "}");
+	}
+	public MongoCursor<T> find(String parameter,String condition,String value){
+		
+		
+			MongoCursor<T> cursor =collection.find("{"+parameter+": {"+condition+":"+value+"}}").as(t);
+			return cursor;
+		
+	}
+
+	public T next(MongoCursor<Person> cursor)throws NoSuchElementException {
+		return (T) cursor.next();
 	}
 }
