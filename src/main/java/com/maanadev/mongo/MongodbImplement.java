@@ -35,11 +35,6 @@ public class MongodbImplement<T> {
 		mongoClient.close();
 	}
 
-	public T get(String id) {
-
-		T return_t = (T) collection.findOne("{ _id:" + id + "}").as(t);
-		return return_t;
-	}
 
 	public long getCount() {
 		return collection.count();
@@ -55,6 +50,13 @@ public class MongodbImplement<T> {
 			return cursor;
 		
 	}
+	public MongoCursor<T> find(String parameter,String value){
+		
+		
+		MongoCursor<T> cursor =collection.find("{"+parameter+": {"+DBConstants.EQUAL+":"+value+"}}").as(t);
+		return cursor;
+	
+}
 
 	public T next(MongoCursor<Person> cursor)throws NoSuchElementException {
 		return (T) cursor.next();

@@ -25,14 +25,13 @@ public class Example {
 		m.save(p);
 		System.out.println("saved");
 
-		// GET THE PERSON OBJECT
-		// Person p_return = m.get("1234");
 
 		// DELETE
 		// m.delete("1234");
 
 		// FIND PERSON
-		MongoCursor<Person> cursor = m.find("age", DBConstants.LESS_THAN, "19");
+		//MongoCursor<Person> cursor = m.find("age", DBConstants.LESS_THAN, "19");
+		MongoCursor<Person> cursor = m.find("age","18");
 		Person p_return = null;
 		try {
 			p_return = m.next(cursor);
