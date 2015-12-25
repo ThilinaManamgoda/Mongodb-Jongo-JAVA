@@ -15,4 +15,10 @@ public interface DBConstants {
 	// SORTING
 	public static final String ASCENDING = "1";
 	public static final String DESCENDING = "-1";
+
+	// UPDATING OPRATORS
+	public static final String INCREMENT = "$inc";
+	public static final String MULITIPLIE = "$mul";
+	public static final String SET = "$set";
+	public static final String RENAME = "$rename";
 }

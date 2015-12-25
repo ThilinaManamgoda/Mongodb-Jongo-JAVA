@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 import org.jongo.Jongo;
 import org.jongo.MongoCollection;
 import org.jongo.MongoCursor;
+import org.jongo.marshall.jackson.oid.MongoId;
 
 import com.maanadev.example.Person;
 import com.mongodb.DB;
@@ -198,6 +199,27 @@ public class MongodbImplement<T> {
 	}
 
 	// ****************************************************************************************
+
+	public void update(UpdateQuery updateQuery) {
+
+		String find = null;
+		if (updateQuery.getFindCondition() == null) {
+			if (updateQuery.getFindObj() == null) {
+				find = makeFindEqual(updateQuery.getFindParameter(), updateQuery.getFindValue());
+				executeUpdate(updateQuery, find);
+			} else {
+				find = "{" + updateQuery.getFindParameter() + ": #}";
+				executeUpdate(updateQuery, find, updateQuery.getFindObj());
+
+			}
+		} else {
+			find = makeFindCondition(updateQuery.getFindParameter(), updateQuery.getFindCondition(),
+					updateQuery.getFindValue());
+			executeUpdate(updateQuery, find);
+		}
+
+	}
+
 	private boolean isNumeric(String value) {
 
 		try {
@@ -210,22 +232,132 @@ public class MongodbImplement<T> {
 
 	private String makeFindEqual(String parameter, String value) {
 		String find;
-		if (isNumeric(value)) {
-			find = "{" + parameter + ": {" + DBConstants.EQUAL + ":" + value + "}}";
-			return find;
+		if (isMongoId(parameter)) {
+			if (isNumeric(value)) {
+				find = "{ _id: {" + DBConstants.EQUAL + ":" + value + "}}";
+				return find;
+			} else {
+				find = "{ _id: {" + DBConstants.EQUAL + ":'" + value + "'}}";
+				return find;
+			}
 		} else {
-			find = "{" + parameter + ": {" + DBConstants.EQUAL + ":" + value + "}}";
-			return find;
+			if (isNumeric(value)) {
+				find = "{" + parameter + ": {" + DBConstants.EQUAL + ":" + value + "}}";
+				return find;
+			} else {
+				find = "{" + parameter + ": {" + DBConstants.EQUAL + ":'" + value + "'}}";
+				return find;
+			}
 		}
+
 	}
 
 	private String makeFindCondition(String parameter, String condition, String value) {
 		String find;
-		if (isNumeric(value))
-			find = "{" + parameter + ": {" + condition + ":" + value + "}}";
-		else
-			find = "{" + parameter + ": {" + condition + ":'" + value + "'}}";
+
+		if (isMongoId(parameter)) {
+			if (isNumeric(value)) {
+				find = "{ _id: {" + condition + ":" + value + "}}";
+			} else
+				find = "{ _id: {" + condition + ":'" + value + "'}}";
+
+		} else {
+			if (isNumeric(value)) {
+				find = "{" + parameter + ": {" + condition + ":" + value + "}}";
+			} else
+				find = "{" + parameter + ": {" + condition + ":'" + value + "'}}";
+		}
+
 		return find;
+	}
+
+	public boolean isMongoId(String parameter) {
+		try {
+			if (t.getDeclaredField(parameter).getDeclaredAnnotation(MongoId.class) == null)
+				return false;
+
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return true;
+	}
+
+	private void executeUpdate(UpdateQuery updateQuery, String find) {
+		String with = null;
+		if (updateQuery.getOpereator().equals(DBConstants.INCREMENT)) {
+
+			with = "{$inc: {" + updateQuery.getParameter() + ": " + updateQuery.getObj().toString() + "}}";
+			if (updateQuery.isCreateNewDocuments()) {
+				if (updateQuery.isMultipleDocuments())
+					collection.update(find).upsert().multi().with(with);
+				else
+					collection.update(find).upsert().with(with);
+			} else {
+				if (updateQuery.isMultipleDocuments())
+					collection.update(find).multi().with(with);
+
+				else
+					collection.update(find).with(with);
+			}
+
+		} else if (updateQuery.getOpereator().equals(DBConstants.SET)) {
+			with = "{$set: {" + updateQuery.getParameter() + ": #}}";
+			if (updateQuery.isCreateNewDocuments()) {
+				if (updateQuery.isMultipleDocuments())
+					collection.update(find).upsert().multi().with(with, updateQuery.getObj());
+				else
+					collection.update(find).upsert().with(with, updateQuery.getObj());
+			} else {
+				if (updateQuery.isMultipleDocuments())
+					collection.update(find).multi().with(with, updateQuery.getObj());
+
+				else
+					collection.update(find).with(with, updateQuery.getObj());
+			}
+
+		}
+
+	}
+
+	private void executeUpdate(UpdateQuery updateQuery, String find, Object obj) {
+		String with = null;
+		if (updateQuery.getOpereator().equals(DBConstants.INCREMENT)) {
+
+			with = "{$inc: {" + updateQuery.getParameter() + ": " + updateQuery.getObj().toString() + "}}";
+			if (updateQuery.isCreateNewDocuments()) {
+				if (updateQuery.isMultipleDocuments())
+					collection.update(find, obj).upsert().multi().with(with);
+				else
+					collection.update(find, obj).upsert().with(with);
+			} else {
+				if (updateQuery.isMultipleDocuments())
+					collection.update(find, obj).multi().with(with);
+
+				else
+					collection.update(find, obj).with(with);
+			}
+
+		} else if (updateQuery.getOpereator().equals(DBConstants.SET)) {
+			with = "{$set: {" + updateQuery.getParameter() + ": #}}";
+			if (updateQuery.isCreateNewDocuments()) {
+				if (updateQuery.isMultipleDocuments())
+					collection.update(find, obj).upsert().multi().with(with, updateQuery.getObj());
+				else
+					collection.update(find, obj).upsert().with(with, updateQuery.getObj());
+			} else {
+				if (updateQuery.isMultipleDocuments())
+					collection.update(find, obj).multi().with(with, updateQuery.getObj());
+
+				else
+					collection.update(find, obj).with(with, updateQuery.getObj());
+			}
+
+		}
+
 	}
 
 }
